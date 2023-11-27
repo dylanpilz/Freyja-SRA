@@ -34,7 +34,7 @@ jobs:
               git pull
               git add -A
               git commit -m "Data dump"
-              git push
+              git push --force
 
 
               
