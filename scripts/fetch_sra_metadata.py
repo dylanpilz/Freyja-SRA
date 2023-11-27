@@ -77,9 +77,9 @@ argparser = argparse.ArgumentParser(description='Fetch most recent SRA metadata'
 def get_metadata():
 
     date_ranges = [
-        ('2023-07-01', '2023-10-01'),
-        ('2023-04-01' ,'2023-07-01'),
-        ('2023-01-01', '2023-04-01'),
+        # ('2023-07-01', '2023-10-01'),
+        # ('2023-04-01' ,'2023-07-01'),
+        # ('2023-01-01', '2023-04-01'),
         ('2022-10-01', '2023-01-01'),
         ('2022-07-01', '2022-04-01') 
     ]
@@ -88,12 +88,8 @@ def get_metadata():
     for date_range in date_ranges:
         print(date_range)
 
-        start_dt = datetime.strptime(date_range[0], '%Y-%m-%d')
-        end_dt = datetime.strptime(date_range[1], '%Y-%m-%d')
-
-        # Get a list of all dates between start and end date
-        start_dt = date(2022, 4, 1)
-        end_dt = date(2022, 8, 1)
+        start_dt = datetime.strptime(date_range[0], '%Y-%m-%d').date()
+        end_dt = datetime.strptime(date_range[1], '%Y-%m-%d').date()
 
         # difference between current and previous date
         delta = timedelta(days=1)
@@ -222,8 +218,8 @@ def main():
     samples_to_run = samples_to_run[samples_to_run['collection_date'] >='2022-04-01']
     samples_to_run = samples_to_run[samples_to_run['collection_date'] <='2022-08-01']
 
-    # 10 samples per collection date
-    #samples_to_run = samples_to_run.groupby('collection_date').head(10)
+    # 20 samples per collection date
+    samples_to_run = samples_to_run.groupby('collection_date').head(20)
 
     print('All samples: ', len(all_metadata))
     print('Newly added samples: ', len(new_metadata))
