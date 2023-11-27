@@ -95,7 +95,7 @@ def get_metadata():
                                 AND ("{date_range[0]}"[Publication Date] : "{date_range[1]}"[Publication Date]))') 
         record = Entrez.read(handle)
         handle.close()
-
+        
         try:
             handle = Entrez.efetch(db="sra", id=record['IdList'], rettype="gb",retmode='text')
         except urllib.error.HTTPError as e:
@@ -152,6 +152,7 @@ def main():
     metadata = metadata.sort_values(by='collection_date',ascending=False)
 
     # Filter to USA samples
+    metadata = metadata[~metadata['geo_loc_name'].isna()]
     metadata = metadata[metadata['geo_loc_name'].str.contains('USA')]
     
     if 'collection_site_id' not in metadata.columns:
