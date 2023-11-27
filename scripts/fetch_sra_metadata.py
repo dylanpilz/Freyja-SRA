@@ -108,7 +108,7 @@ def get_metadata():
             start_dt += delta
 
         date_str = ' OR '.join(dates)
-        
+
         search_term = f'(wastewater[All Fields] AND\
                          ("Severe acute respiratory syndrome coronavirus 2"[Organism] OR sars-cov-2[All Fields])) AND\
                             ({date_str})'
@@ -220,7 +220,7 @@ def main():
     all_metadata['collection_date'] = pd.to_datetime(all_metadata['collection_date'], format='%Y-%m-%d')
 
     samples_to_run = samples_to_run[samples_to_run['collection_date'] >='2022-04-01']
-    samples_to_run = samples_to_run[samples_to_run['collection_date'] <='2023-10-01']
+    samples_to_run = samples_to_run[samples_to_run['collection_date'] <='2022-08-01']
 
     # 10 samples per collection date
     #samples_to_run = samples_to_run.groupby('collection_date').head(10)
