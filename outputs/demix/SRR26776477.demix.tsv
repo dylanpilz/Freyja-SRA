@@ -1,0 +1,6 @@
+	SRR26776477.variants.tsv
+summarized	[('XBB* (XBB.X)', 0.5000000067122565), ('XBB.2.3* [Omicron (XBB.2.3.X)]', 0.49999999676761175)]
+lineages	XBB.2.3.2 XBB.1.43.1 XBB.3.3
+abundances	0.50000000 0.40000000 0.10000001
+resid	13.532224420272135
+coverage	0.0
