@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+from datetime import date,timedelta,datetime
 import os
 import json
 import pandas as pd
@@ -80,22 +81,45 @@ def get_metadata():
         ('2023-04-01' ,'2023-07-01'),
         ('2023-01-01', '2023-04-01'),
         ('2022-10-01', '2023-01-01'),
-        ('2022-07-01', '2022-03-01') 
+        ('2022-07-01', '2022-04-01') 
     ]
 
     metadata = pd.DataFrame()
     for date_range in date_ranges:
         print(date_range)
 
+        start_dt = datetime.strptime(date_range[0], '%Y-%m-%d')
+        end_dt = datetime.strptime(date_range[1], '%Y-%m-%d')
+
+        # Get a list of all dates between start and end date
+        start_dt = date(2022, 4, 1)
+        end_dt = date(2022, 8, 1)
+
+        # difference between current and previous date
+        delta = timedelta(days=1)
+
+        # store the dates between two dates in a list
+        dates = []
+
+        while start_dt <= end_dt:
+            # add current date to list by converting  it to iso format
+            dates.append(start_dt.isoformat() + '[All Fields]')
+            # increment start date by timedelta
+            start_dt += delta
+
+        date_str = ' OR '.join(dates)
+        
+        search_term = f'(wastewater[All Fields] AND\
+                         ("Severe acute respiratory syndrome coronavirus 2"[Organism] OR sars-cov-2[All Fields])) AND\
+                            ({date_str})'
+
         Entrez.email = "jolevy@scripps.edu"
         handle = Entrez.esearch(db="sra", idtype='acc', retmax=4000,
                                 sort='recently_added',
-                                term=f'((wastewater metagenome[Organism] OR wastewater metagenome[All Fields]) \
-                                AND SARS-CoV-2 \
-                                AND ("{date_range[0]}"[Publication Date] : "{date_range[1]}"[Publication Date]))') 
+                                term=search_term) 
         record = Entrez.read(handle)
         handle.close()
-        
+
         try:
             handle = Entrez.efetch(db="sra", id=record['IdList'], rettype="gb",retmode='text')
         except urllib.error.HTTPError as e:
@@ -159,6 +183,9 @@ def main():
         metadata['collection_site_id'] = pd.NA
     # For samples with no site id, hash the location and population to create a unique id
     states = pd.Series(metadata['geo_loc_name'].str.split(': ').apply(lambda x: x[1].split(',')[0] if len(x) > 1 else x[0]))
+    if 'US Virgin Islands' in states.unique():
+        states = states.replace('US Virgin Islands', 'U.S. Virgin Islands')
+
     merged = (states.apply(lambda x : us_state_to_abbrev[x])) + metadata['ww_population'].fillna('').astype(str)
     #merged = merged.apply(lambda x:shortuuid.uuid(x)[0:12])
     metadata['site_id'] = metadata['collection_site_id'].combine_first(merged)
