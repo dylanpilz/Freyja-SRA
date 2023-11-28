@@ -143,6 +143,7 @@ process AGGREGATE_DEMIX {
     # Remove rows where 'ww_surv_target_1_conc' is 'not provided' or 'missing'
     df = df[df['ww_surv_target_1_conc'].astype(str) != 'not provided']
     df = df[df['ww_surv_target_1_conc'].astype(str) != 'missing']
+    df = df[df['ww_population'].astype(str) != 'missing']
 
     df = df.rename(columns={'ww_surv_target_1_conc':'viral_load'})
 
