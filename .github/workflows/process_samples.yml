@@ -1,8 +1,8 @@
 name: Process samples
 
 on:
-  push:
-    branches: [ main ]
+  schedule:
+    - cron: '0 * * * *'
 
 jobs:
   fetch_ncbi_metadata:
