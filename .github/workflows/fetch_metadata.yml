@@ -31,4 +31,4 @@ jobs:
               git pull
               git add -A
               git commit -m "Update metadata"
-              git push --force
+              git push
