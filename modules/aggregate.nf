@@ -49,8 +49,7 @@ process AGGREGATE_VARIANTS {
 }
 
 process AGGREGATE_DEMIX {
-    errorStrategy 'ignore'
-    
+
     publishDir "${params.output}/aggregate", mode: 'copy'
     input:
     val demix_outputs
@@ -154,9 +153,8 @@ process AGGREGATE_DEMIX {
     df = df[df['lineages'] != ''] 
 
     with open('${baseDir}/outputs/aggregate/aggregate_demix.json', 'w') as f:
-        for row in df.iterrows():
+       for row in df.iterrows():
 
-            
             json_row = {
                 'sra_accession': row[0],
                 'lineages': [
@@ -165,7 +163,7 @@ process AGGREGATE_DEMIX {
                 'collection_date': row[1]['collection_date'].values[0],
                 'geo_loc_country': row[1]['geo_loc_country'].values[0],
                 'geo_loc_region': row[1]['geo_loc_region'].values[0],
-                'ww_population': float(str(row[1]['ww_population'].values[0]).replace('<','').replace('>','')),
+                'ww_population': str(row[1]['ww_population'].values[0]).replace('<','').replace('>',''),
                 'viral_load': row[1]['viral_load'].values[0],
                 'site_id': row[1]['site_id'].values[0]
             }
@@ -173,8 +171,10 @@ process AGGREGATE_DEMIX {
             if str(json_row['viral_load']).lower() == 'nan' or json_row['viral_load'] == 'not provided' or json_row['viral_load'] == 'missing':
                 json_row['viral_load'] = -1.0
             
-            if json_row['ww_population'] == None or str(json_row['ww_population']).lower() == 'nan' or str(json_row['ww_population']).lower() == 'missing':
+            if json_row['ww_population'] == None or str(json_row['ww_population']).lower() == 'nan' or json_row['ww_population'] == 'missing':
                 json_row['ww_population'] = -1.0
+
+            json_row['ww_population'] = float(json_row['ww_population'])
             
             json_row = json.dumps(json_row)
             f.write(json_row+'\\n')
