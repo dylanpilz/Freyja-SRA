@@ -49,6 +49,8 @@ process AGGREGATE_VARIANTS {
 }
 
 process AGGREGATE_DEMIX {
+    errorStrategy 'ignore'
+    
     publishDir "${params.output}/aggregate", mode: 'copy'
     input:
     val demix_outputs
@@ -154,6 +156,7 @@ process AGGREGATE_DEMIX {
     with open('${baseDir}/outputs/aggregate/aggregate_demix.json', 'w') as f:
         for row in df.iterrows():
 
+            
             json_row = {
                 'sra_accession': row[0],
                 'lineages': [

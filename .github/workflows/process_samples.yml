@@ -2,7 +2,7 @@ name: Process samples
 
 on:
   schedule:
-      - cron:  '*/30 * * * *'
+      - cron:  '0 */6 * * *'
 
 jobs:
   fetch_ncbi_metadata:
@@ -25,7 +25,7 @@ jobs:
               pip install pandas biopython shortuuid
 
       - name: Run pipeline on new samples
-        run: bash scripts/test_run_pipeline.sh
+        run: bash scripts/run_pipeline.sh
       
       - name: Commit and push changes
         run: |
