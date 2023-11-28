@@ -2,7 +2,7 @@ name: Process samples
 
 on:
   schedule:
-    - cron: '0 * * * *'
+      - cron:  '0 * * * *'
 
 jobs:
   fetch_ncbi_metadata:
