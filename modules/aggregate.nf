@@ -153,7 +153,7 @@ process AGGREGATE_DEMIX {
 
     with open('${baseDir}/outputs/aggregate/aggregate_demix.json', 'w') as f:
         for row in df.iterrows():
-            if row[1]['ww_population'] == 'missing':
+            if str(row[1]['ww_population'].values[0]) == 'missing':
                 row[1]['ww_population'] = -1.0
             json_row = {
                 'sra_accession': row[0],
