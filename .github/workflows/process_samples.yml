@@ -2,8 +2,8 @@ name: Process samples
 
 on:
   push:
-      branches:
-          - main
+    branches:
+        - main
   # schedule:
   #     - cron:  '0 * * * *'
 
