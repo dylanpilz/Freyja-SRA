@@ -3,7 +3,7 @@ name: Process samples
 on:
   push:
     branches:
-        - main
+      - main
   # schedule:
   #     - cron:  '0 * * * *'
 
