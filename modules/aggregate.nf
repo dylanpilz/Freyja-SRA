@@ -169,7 +169,7 @@ process AGGREGATE_DEMIX {
             if str(json_row['viral_load']).lower() == 'nan' or json_row['viral_load'] == 'not provided' or json_row['viral_load'] == 'missing':
                 json_row['viral_load'] = -1.0
             
-            if json_row['ww_population'] == None or str(json_row['ww_population']).lower() == 'nan':
+            if json_row['ww_population'] == None or str(json_row['ww_population']).lower() == 'nan' or str(json_row['ww_population']).lower() == 'missing':
                 json_row['ww_population'] = -1.0
             
             json_row = json.dumps(json_row)
