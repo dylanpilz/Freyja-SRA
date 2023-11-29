@@ -5,8 +5,9 @@ on:
       - cron:  '0 */6 * * *'
 
 jobs:
-  fetch_ncbi_metadata:
+  run_samples:
     runs-on: self-hosted
+    timeout-minutes: 330
 
     steps:
       - name: Checkout main
@@ -27,6 +28,9 @@ jobs:
       - name: Run pipeline on new samples
         run: bash scripts/run_pipeline.sh
       
+  commit_changes:
+    runs-on: self-hosted
+    steps:
       - name: Commit and push changes
         run: |
               git config --local user.name "$GITHUB_ACTOR"
