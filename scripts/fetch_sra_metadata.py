@@ -77,11 +77,11 @@ argparser = argparse.ArgumentParser(description='Fetch most recent SRA metadata'
 def get_metadata():
 
     date_ranges = [
-        # ('2023-07-01', '2023-10-01'),
-        # ('2023-04-01' ,'2023-07-01'),
-        # ('2023-01-01', '2023-04-01'),
+        ('2023-07-01', '2023-10-01'),
+        ('2023-04-01', '2023-07-01'),
+        ('2023-01-01', '2023-04-01'),
         ('2022-10-01', '2023-01-01'),
-        ('2022-07-01', '2022-04-01') 
+        ('2022-04-01', '2022-07-01') 
     ]
 
     metadata = pd.DataFrame()
@@ -210,16 +210,14 @@ def main():
     samples_to_run['ww_population'] = samples_to_run['ww_population'].astype(str)
     samples_to_run = samples_to_run[~samples_to_run['ww_population'].str.contains('<')]
     samples_to_run = samples_to_run[~samples_to_run['ww_population'].str.contains('>')]
+    samples_to_run = samples_to_run[~samples_to_run['ww_population'].str.contains('missing')]
     samples_to_run = samples_to_run[~samples_to_run['ww_population'].isna()]
 
     samples_to_run['collection_date'] = pd.to_datetime(samples_to_run['collection_date'], format='%Y-%m-%d')
     all_metadata['collection_date'] = pd.to_datetime(all_metadata['collection_date'], format='%Y-%m-%d')
 
     samples_to_run = samples_to_run[samples_to_run['collection_date'] >='2022-04-01']
-    samples_to_run = samples_to_run[samples_to_run['collection_date'] <='2022-08-01']
-
-    # 20 samples per collection date
-    samples_to_run = samples_to_run.groupby('collection_date').head(20)
+    samples_to_run = samples_to_run[samples_to_run['collection_date'] <='2023-10-01']
 
     print('All samples: ', len(all_metadata))
     print('Newly added samples: ', len(new_metadata))
