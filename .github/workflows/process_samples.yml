@@ -7,7 +7,6 @@ on:
 jobs:
   run_samples:
     runs-on: self-hosted
-    timeout-minutes: 330
 
     steps:
       - name: Checkout main
