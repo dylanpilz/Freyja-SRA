@@ -32,6 +32,7 @@ jobs:
         run: |
               git config --local user.name "$GITHUB_ACTOR"
               git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+              git config --global http.postBuffer 164012661
               git add -A
               git commit -m "Data dump"
               git push --force
