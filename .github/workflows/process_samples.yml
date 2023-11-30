@@ -27,10 +27,7 @@ jobs:
 
       - name: Run pipeline on new samples
         run: bash scripts/run_pipeline.sh
-      
-  commit_changes:
-    runs-on: self-hosted
-    steps:
+
       - name: Commit and push changes
         run: |
               git config --local user.name "$GITHUB_ACTOR"
