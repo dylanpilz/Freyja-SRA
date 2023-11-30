@@ -81,6 +81,7 @@ def get_metadata():
         ('2023-04-01', '2023-07-01'),
         ('2023-01-01', '2023-04-01'),
         ('2022-10-01', '2023-01-01'),
+        ('2022-07-01', '2022-10-01'),
         ('2022-04-01', '2022-07-01') 
     ]
 
@@ -160,8 +161,6 @@ def get_metadata():
 
         metadata = pd.concat([metadata, pd.DataFrame(allDictVals).T], axis=0)
 
-    metadata = metadata.drop_duplicates()
-
     return metadata
 def main():
     metadata = get_metadata()
@@ -202,7 +201,7 @@ def main():
     # Failed samples will produce variants output but fail in the demixing step
     failed_samples = [file.split('.')[0] for file in os.listdir('outputs/variants') if f'{file.split(".")[0]}.demix.tsv' not in os.listdir('outputs/demix')]
 
-    
+    all_metadata = all_metadata[~all_metadata.index.duplicated(keep='first')]
     samples_to_run = all_metadata.copy()
     samples_to_run = samples_to_run[~samples_to_run.index.isin(failed_samples)]
     samples_to_run = samples_to_run[~samples_to_run.index.isin(demixed_samples)]
