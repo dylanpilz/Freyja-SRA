@@ -182,7 +182,10 @@ def main():
         states = states.replace('US Virgin Islands', 'U.S. Virgin Islands')
 
     merged = (states.apply(lambda x : us_state_to_abbrev[x])) + metadata['ww_population'].fillna('').astype(str)
-    #merged = merged.apply(lambda x:shortuuid.uuid(x)[0:12])
+    # Drop duplicates from merged
+    merged = merged[~merged.index.duplicated(keep='first')]
+    metadata = metadata[~metadata.index.duplicated(keep='first')]
+ 
     metadata['site_id'] = metadata['collection_site_id'].combine_first(merged)
 
     # Since Entrez returns the most recent samples, we need to concatenate the new metadata with the old metadata
