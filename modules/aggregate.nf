@@ -1,4 +1,5 @@
 process AGGREGATE_VARIANTS {
+    errorStrategy 'ignore'
     publishDir "${params.output}/aggregate", mode: 'copy'
     input:
     val variants_outputs
@@ -184,6 +185,7 @@ process AGGREGATE_DEMIX {
 }
 
 process AGGREGATE_COVARIANTS {
+    errorStrategy 'ignore'
     publishDir "${params.output}/aggregate", mode: 'copy'
     input:
     val covariants_outputs
