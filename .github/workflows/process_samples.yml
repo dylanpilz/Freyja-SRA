@@ -2,7 +2,7 @@ name: Process samples
 
 on:
   schedule:
-      - cron:  '0 */4 * * *'
+      - cron:  '0 */6 * * *'
 
 jobs:
   run_samples:
