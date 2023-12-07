@@ -14,5 +14,5 @@ do
     wait $BACK_PID
     rm -rf work
 
-    sed -i '2,31d' data/samples_to_run.csv
+    sed -i '2,51d' data/samples_to_run.csv
 done
