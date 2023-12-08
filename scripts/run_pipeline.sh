@@ -16,3 +16,7 @@ do
 
     sed -i '2,51d' data/samples_to_run.csv
 done
+
+python scripts/aggregate_demix.py .
+BACK_PID=$!
+wait $BACK_PID

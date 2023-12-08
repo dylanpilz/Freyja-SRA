@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
-from datetime import date,timedelta,datetime
+from datetime import timedelta,datetime
 import os
 import json
 import pandas as pd
 from Bio import Entrez
-from Bio import SeqIO
 import xml.etree.ElementTree as ET
 import http.client
 import urllib.error
@@ -92,16 +91,11 @@ def get_metadata():
         start_dt = datetime.strptime(date_range[0], '%Y-%m-%d').date()
         end_dt = datetime.strptime(date_range[1], '%Y-%m-%d').date()
 
-        # difference between current and previous date
         delta = timedelta(days=1)
-
-        # store the dates between two dates in a list
         dates = []
 
         while start_dt <= end_dt:
-            # add current date to list by converting  it to iso format
             dates.append(start_dt.isoformat() + '[All Fields]')
-            # increment start date by timedelta
             start_dt += delta
 
         date_str = ' OR '.join(dates)
@@ -162,13 +156,16 @@ def get_metadata():
         metadata = pd.concat([metadata, pd.DataFrame(allDictVals).T], axis=0)
 
     return metadata
+
 def main():
     metadata = get_metadata()
 
     # Convert collection date to datetime
     metadata  = metadata[metadata['collection_date'].str.contains('20[0-9]{2}-[0-9]{2}-[0-9]{2}')]
     metadata['collection_date'] = pd.to_datetime(metadata['collection_date'].apply(lambda x: x.split('/')[0] if '/' in x else x))
+
     metadata = metadata.sort_values(by='collection_date',ascending=False)
+
 
     # Filter to USA samples
     metadata = metadata[~metadata['geo_loc_name'].isna()]
@@ -176,13 +173,15 @@ def main():
     
     if 'collection_site_id' not in metadata.columns:
         metadata['collection_site_id'] = pd.NA
+
     # For samples with no site id, hash the location and population to create a unique id
     states = pd.Series(metadata['geo_loc_name'].str.split(': ').apply(lambda x: x[1].split(',')[0] if len(x) > 1 else x[0]))
     if 'US Virgin Islands' in states.unique():
         states = states.replace('US Virgin Islands', 'U.S. Virgin Islands')
 
     merged = (states.apply(lambda x : us_state_to_abbrev[x])) + metadata['ww_population'].fillna('').astype(str)
-    # Drop duplicates from merged
+
+    # Drop duplicates
     merged = merged[~merged.index.duplicated(keep='first')]
     metadata = metadata[~metadata.index.duplicated(keep='first')]
  
@@ -192,6 +191,9 @@ def main():
     current_metadata = pd.read_csv('data/all_metadata.csv', index_col=0)
     new_metadata = metadata[~metadata.index.isin(current_metadata.index)]
     all_metadata = pd.concat([current_metadata, metadata], axis=0)
+
+    # Filter to samples with numeric population
+    all_metadata = all_metadata[pd.to_numeric(all_metadata['ww_population'], errors='coerce').notnull()]
 
     data = []
     with open('outputs/aggregate/aggregate_demix.json') as f:
@@ -209,15 +211,14 @@ def main():
     samples_to_run = samples_to_run[~samples_to_run.index.isin(failed_samples)]
     samples_to_run = samples_to_run[~samples_to_run.index.isin(demixed_samples)]
     samples_to_run = samples_to_run[~samples_to_run['ww_surv_target_1_conc'].isna()]
-    samples_to_run['ww_population'] = samples_to_run['ww_population'].astype(str)
-    samples_to_run = samples_to_run[~samples_to_run['ww_population'].str.contains('<')]
-    samples_to_run = samples_to_run[~samples_to_run['ww_population'].str.contains('>')]
-    samples_to_run = samples_to_run[~samples_to_run['ww_population'].str.contains('missing')]
     samples_to_run = samples_to_run[~samples_to_run['ww_population'].isna()]
+    samples_to_run['ww_population'] = samples_to_run['ww_population'].astype(str)
+    
 
     samples_to_run['collection_date'] = pd.to_datetime(samples_to_run['collection_date'], format='%Y-%m-%d')
     all_metadata['collection_date'] = pd.to_datetime(all_metadata['collection_date'], format='%Y-%m-%d')
 
+    # Temporary filter for freyja paper
     samples_to_run = samples_to_run[samples_to_run['collection_date'] >='2022-04-01']
     samples_to_run = samples_to_run[samples_to_run['collection_date'] <='2023-10-01']
 

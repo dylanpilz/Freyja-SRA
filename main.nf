@@ -117,7 +117,7 @@ workflow freyja {
         .set { covariants_ch }
 
     //AGGREGATE_VARIANTS(variants_ch, baseDir)
-    //AGGREGATE_DEMIX(demix_ch, baseDir)
+    AGGREGATE_DEMIX(demix_ch, baseDir)
     //AGGREGATE_COVARIANTS(covariants_ch, baseDir)
 
 }
