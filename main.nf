@@ -115,11 +115,6 @@ workflow freyja {
     FREYJA_COVARIANTS(sra_accession, input_bam, bam_index, ref, annot)
         .collect()
         .set { covariants_ch }
-
-    //AGGREGATE_VARIANTS(variants_ch, baseDir)
-    AGGREGATE_DEMIX(demix_ch, baseDir)
-    //AGGREGATE_COVARIANTS(covariants_ch, baseDir)
-
 }
 
 

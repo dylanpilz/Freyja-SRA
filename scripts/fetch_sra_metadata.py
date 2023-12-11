@@ -224,7 +224,7 @@ def main():
 
     print('All samples: ', len(all_metadata))
     print('Newly added samples: ', len(new_metadata))
-    print('Processed samples: ', len(demixed_samples))
+    print('Processed samples: ', len(demixed_samples)+len(failed_samples))
     print('Samples to run: ', len(samples_to_run))
 
     # Sort both dataframes by collection date

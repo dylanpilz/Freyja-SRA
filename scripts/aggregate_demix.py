@@ -11,6 +11,13 @@ parser = argparse.ArgumentParser(description='Aggregate demix outputs')
 parser.add_argument('basedir', type=str, help='Base directory')
 args = parser.parse_args()
 
+def isnumber(x):
+    try:
+        float(x)
+        return True
+    except:
+        return False
+
 def get_alias_key(lineages_yml=f'{args.basedir}/data/lineages.yml'):
     with open(lineages_yml, 'r') as alias_key:
         lineage_key = yaml.load(alias_key, Loader=yaml.Loader)
@@ -55,7 +62,6 @@ def main():
     # Save to json
     agg_demix = pd.read_csv('aggregate_demix.tsv', sep='\t')
 
-
     agg_demix['lin_dict'] = [dict(zip(row['lineages'].split(' '), map(float, row['abundances'].split(' ')))) for _, row in agg_demix.iterrows()]
     agg_demix['lin_dict'] = agg_demix['lin_dict'].apply(merge_collapsed)
     agg_demix['lineages'] = agg_demix['lin_dict'].apply(lambda x: ' '.join(list(x.keys())))
@@ -65,6 +71,7 @@ def main():
     metadata = pd.read_csv(f'{args.basedir}/data/all_metadata.csv')
     metadata['geo_loc_country'] = metadata['geo_loc_name'].apply(lambda x: x.split(':')[0].strip())
     metadata['geo_loc_region'] = metadata['geo_loc_name'].apply(lambda x: x.split(':')[1].strip() if len(x.split(':')) > 1 else '')
+    metadata['ww_surv_target_1_conc'] = metadata['ww_surv_target_1_conc'].apply(lambda x: x if isnumber(x) else -1.0)
 
     columns = ['accession', 'lineages', 'abundances', 'crumbs', 'collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population', 'ww_surv_target_1_conc', 'site_id', 'coverage']
 
@@ -87,9 +94,6 @@ def main():
     for col in ['collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population','ww_surv_target_1_conc', 'site_id']:
         df[col] = [metadata[metadata['Unnamed: 0'] == x][col] for x in df['accession']]
 
-    # Remove rows where 'ww_surv_target_1_conc' is 'not provided' or 'missing'
-    df = df[df['ww_surv_target_1_conc'].astype(str) != 'not provided']
-    df = df[df['ww_surv_target_1_conc'].astype(str) != 'missing']
 
     df = df.rename(columns={'ww_surv_target_1_conc':'viral_load'})
 
@@ -113,14 +117,10 @@ def main():
                 'site_id': row[1]['site_id'].values[0],
                 'coverage': row[1]['coverage']
             }
-
-            if str(json_row['viral_load']).lower() == 'nan' or json_row['viral_load'] == 'not provided' or json_row['viral_load'] == 'missing':
-                json_row['viral_load'] = -1.0
-
-            json_row['ww_population'] = float(json_row['ww_population'])
             
             json_row = json.dumps(json_row)
             f.write(json_row+'\n')
+
     subprocess.run(['rm', '-rf', 'aggregate_dir'])
 
 if __name__ == '__main__':
