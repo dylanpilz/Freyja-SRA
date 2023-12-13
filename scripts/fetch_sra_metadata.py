@@ -73,6 +73,13 @@ us_state_to_abbrev = {
 
 argparser = argparse.ArgumentParser(description='Fetch most recent SRA metadata')
 
+def isnumber(x):
+    try:
+        float(x)
+        return True
+    except:
+        return False
+
 def get_metadata():
 
     date_ranges = [
@@ -176,6 +183,7 @@ def main():
 
     # For samples with no site id, hash the location and population to create a unique id
     states = pd.Series(metadata['geo_loc_name'].str.split(': ').apply(lambda x: x[1].split(',')[0] if len(x) > 1 else x[0]))
+
     if 'US Virgin Islands' in states.unique():
         states = states.replace('US Virgin Islands', 'U.S. Virgin Islands')
 
@@ -192,8 +200,14 @@ def main():
     new_metadata = metadata[~metadata.index.isin(current_metadata.index)]
     all_metadata = pd.concat([current_metadata, metadata], axis=0)
 
-    # Filter to samples with numeric population
-    all_metadata = all_metadata[pd.to_numeric(all_metadata['ww_population'], errors='coerce').notnull()]
+    all_metadata['ww_population'] = all_metadata['ww_population'].apply(lambda x: x if isnumber(x) else -1.0)
+    all_metadata['ww_surv_target_1_conc'] = all_metadata['ww_surv_target_1_conc'].apply(lambda x: x if isnumber(x) else -1.0)
+
+    all_metadata['ww_population'] = all_metadata['ww_population'].fillna(-1.0)
+    all_metadata['ww_surv_target_1_conc'] = all_metadata['ww_surv_target_1_conc'].fillna(-1.0)
+
+    all_metadata['geo_loc_country'] = all_metadata['geo_loc_name'].apply(lambda x: x.split(':')[0].strip())
+    all_metadata['geo_loc_region'] = all_metadata['geo_loc_name'].apply(lambda x: x.split(':')[1].strip() if len(x.split(':')) > 1 else '')
 
     data = []
     with open('outputs/aggregate/aggregate_demix.json') as f:
