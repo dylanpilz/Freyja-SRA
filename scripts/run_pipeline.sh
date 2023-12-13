@@ -17,4 +17,4 @@ rm -rf work
 sed -i '2,51d' data/samples_to_run.csv
 
 
-python scripts/aggregate_demix.py . || true
+#python scripts/aggregate_demix.py . || true
