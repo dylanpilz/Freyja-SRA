@@ -194,7 +194,8 @@ def main():
     metadata = metadata[~metadata.index.duplicated(keep='first')]
  
     metadata['site_id'] = metadata['collection_site_id'].combine_first(merged)
-
+    metadata = metadata[~metadata['site_id'].isna()]
+    
     # Since Entrez returns the most recent samples, we need to concatenate the new metadata with the old metadata
     current_metadata = pd.read_csv('data/all_metadata.csv', index_col=0)
     new_metadata = metadata[~metadata.index.isin(current_metadata.index)]
@@ -212,7 +213,11 @@ def main():
     data = []
     with open('outputs/aggregate/aggregate_demix.json') as f:
         for line in f:
-            data.append(json.loads(line))
+            try:
+                data.append(json.loads(line))
+            except:
+                 continue
+            
 
     demixed_samples = [d['sra_accession'] for d in data]
 
@@ -221,10 +226,15 @@ def main():
     failed_samples = [file.split('.')[0] for file in os.listdir('outputs/variants') if f'{file.split(".")[0]}.demix.tsv' not in os.listdir('outputs/demix')]
 
     all_metadata = all_metadata[~all_metadata.index.duplicated(keep='first')]
+
     samples_to_run = all_metadata.copy()
     samples_to_run = samples_to_run[~samples_to_run.index.isin(failed_samples)]
     samples_to_run = samples_to_run[~samples_to_run.index.isin(demixed_samples)]
+
     samples_to_run = samples_to_run[~samples_to_run['ww_surv_target_1_conc'].isna()]
+    samples_to_run = samples_to_run[samples_to_run['ww_surv_target_1_conc'] != -1.0]
+
+    samples_to_run = samples_to_run[~samples_to_run['collection_date'].isna()]
     samples_to_run = samples_to_run[~samples_to_run['ww_population'].isna()]
     samples_to_run['ww_population'] = samples_to_run['ww_population'].astype(str)
     

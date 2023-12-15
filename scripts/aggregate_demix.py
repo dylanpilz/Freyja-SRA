@@ -52,12 +52,9 @@ def merge_collapsed(lin_dict):
     return new_dict
 
 def main():
-    subprocess.run(["mkdir", "aggregate_dir"])
-    for file in os.listdir(f'{args.basedir}/outputs/demix'):
-        subprocess.run(["cp", f'{args.basedir}/outputs/demix/' + file, "aggregate_dir"])
 
     # Create intermediate tsv
-    subprocess.run(["freyja", "aggregate", "aggregate_dir/", "--output", "aggregate_demix.tsv"])
+    subprocess.run(["freyja", "aggregate", f"{args.basedir}/outputs/demix/", "--output", "aggregate_demix.tsv"])
     
     # Save to json
     agg_demix = pd.read_csv('aggregate_demix.tsv', sep='\t')
@@ -69,9 +66,6 @@ def main():
     agg_demix.drop('lin_dict', axis=1, inplace=True)
 
     metadata = pd.read_csv(f'{args.basedir}/data/all_metadata.csv')
-    metadata['geo_loc_country'] = metadata['geo_loc_name'].apply(lambda x: x.split(':')[0].strip())
-    metadata['geo_loc_region'] = metadata['geo_loc_name'].apply(lambda x: x.split(':')[1].strip() if len(x.split(':')) > 1 else '')
-    metadata['ww_surv_target_1_conc'] = metadata['ww_surv_target_1_conc'].apply(lambda x: x if isnumber(x) else -1.0)
 
     columns = ['accession', 'lineages', 'abundances', 'crumbs', 'collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population', 'ww_surv_target_1_conc', 'site_id', 'coverage']
 
@@ -91,8 +85,10 @@ def main():
     df['abundances'] = agg_demix['abundances']
     df['coverage'] = agg_demix['coverage']
 
-    for col in ['collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population','ww_surv_target_1_conc', 'site_id']:
-        df[col] = [metadata[metadata['Unnamed: 0'] == x][col] for x in df['accession']]
+    metadata.set_index('Unnamed: 0', inplace=True)
+
+    for col in ['collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population', 'ww_surv_target_1_conc', 'site_id']:
+        df[col] = df['accession'].map(metadata[col])
 
 
     df = df.rename(columns={'ww_surv_target_1_conc':'viral_load'})
@@ -100,6 +96,8 @@ def main():
     df.set_index('accession', inplace=True)
 
     df = df[df['lineages'] != ''] 
+
+    df = df[~df['site_id'].isna()]
 
     with open(f'{args.basedir}/outputs/aggregate/aggregate_demix.json', 'w') as f:
         for row in df.iterrows():
@@ -109,12 +107,12 @@ def main():
                 'lineages': [
                     {'name': lineage, 'abundance': float(abundance), 'crumbs': crumbs} for lineage, abundance, crumbs in zip(row[1]['lineages'].split(' '), row[1]['abundances'].split(' '), row[1]['crumbs'])
                 ],
-                'collection_date': row[1]['collection_date'].values[0],
-                'geo_loc_country': row[1]['geo_loc_country'].values[0],
-                'geo_loc_region': row[1]['geo_loc_region'].values[0],
-                'ww_population': str(row[1]['ww_population'].values[0]).replace('<','').replace('>',''),
-                'viral_load': row[1]['viral_load'].values[0],
-                'site_id': row[1]['site_id'].values[0],
+                'collection_date': row[1]['collection_date'],
+                'geo_loc_country': row[1]['geo_loc_country'],
+                'geo_loc_region': row[1]['geo_loc_region'],
+                'ww_population': row[1]['ww_population'],
+                'viral_load': row[1]['viral_load'],
+                'site_id': row[1]['site_id'],
                 'coverage': row[1]['coverage']
             }
             
