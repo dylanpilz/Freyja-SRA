@@ -112,9 +112,9 @@ workflow freyja {
         .collect()
         .set { demix_ch }
 
-    FREYJA_COVARIANTS(sra_accession, input_bam, bam_index, ref, annot)
-        .collect()
-        .set { covariants_ch }
+    // FREYJA_COVARIANTS(sra_accession, input_bam, bam_index, ref, annot)
+    //     .collect()
+    //     .set { covariants_ch }
 }
 
 
