@@ -177,24 +177,9 @@ def main():
     # Filter to USA samples
     metadata = metadata[~metadata['geo_loc_name'].isna()]
     metadata = metadata[metadata['geo_loc_name'].str.contains('USA')]
-    
-    if 'collection_site_id' not in metadata.columns:
-        metadata['collection_site_id'] = pd.NA
-
-    # For samples with no site id, hash the location and population to create a unique id
-    states = pd.Series(metadata['geo_loc_name'].str.split(': ').apply(lambda x: x[1].split(',')[0] if len(x) > 1 else x[0]))
-
-    if 'US Virgin Islands' in states.unique():
-        states = states.replace('US Virgin Islands', 'U.S. Virgin Islands')
-
-    merged = (states.apply(lambda x : us_state_to_abbrev[x])) + metadata['ww_population'].fillna('').astype(str)
 
     # Drop duplicates
-    merged = merged[~merged.index.duplicated(keep='first')]
     metadata = metadata[~metadata.index.duplicated(keep='first')]
- 
-    metadata['site_id'] = metadata['collection_site_id'].combine_first(merged)
-    metadata = metadata[~metadata['site_id'].isna()]
     
     # Since Entrez returns the most recent samples, we need to concatenate the new metadata with the old metadata
     current_metadata = pd.read_csv('data/all_metadata.csv', index_col=0)
@@ -209,6 +194,16 @@ def main():
 
     all_metadata['geo_loc_country'] = all_metadata['geo_loc_name'].apply(lambda x: x.split(':')[0].strip())
     all_metadata['geo_loc_region'] = all_metadata['geo_loc_name'].apply(lambda x: x.split(':')[1].strip() if len(x.split(':')) > 1 else '')
+    all_metadata['geo_loc_region'] = all_metadata['geo_loc_region'].apply(lambda x: x.split(',')[0].strip() if len(x.split(',')) > 1 else x)
+
+    # Create site_id column
+    if 'US Virgin Islands' in all_metadata['geo_loc_region'].unique():
+        all_metadata['geo_loc_region'] = all_metadata['geo_loc_region'].replace('US Virgin Islands', 'U.S. Virgin Islands')
+
+    all_metadata['site_id'] = (all_metadata['geo_loc_region'].apply(lambda x : us_state_to_abbrev[x])) + all_metadata['ww_population'].fillna('').astype(str)
+    all_metadata['site_id'] = all_metadata['site_id'].apply(lambda x: x.replace('.0', ''))
+
+    all_metadata = all_metadata[~all_metadata['site_id'].isna()]
 
     data = []
     with open('outputs/aggregate/aggregate_demix.json') as f:
