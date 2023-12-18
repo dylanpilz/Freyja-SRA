@@ -86,13 +86,11 @@ process FASTERQ_DUMP {
     tuple val(accession), path(primer_scheme), path(sra_data)
 
     output:
-    tuple val(accession), path(primer_scheme), path("*.fastq.gz")
+    tuple val(accession), path(primer_scheme), path("*.fastq")
 
     script:
     """
     #!/bin/sh
-    fasterq-dump ./${sra_data}/${accession} --progress --threads 8 --split-files
-    gzip *.fastq
-    
+    fasterq-dump ./${sra_data}/${accession} --progress --threads 8 --split-files    
     """
 }
