@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import json
 import os
+import numpy as np
 import yaml
 import pandas as pd
 
@@ -115,7 +116,9 @@ def main():
                 'site_id': row[1]['site_id'],
                 'coverage': row[1]['coverage']
             }
-            
+            if not np.isfinite([lin['abundance'] for lin in json_row['lineages']]).all():
+                continue
+
             json_row = json.dumps(json_row)
             f.write(json_row+'\n')
 
