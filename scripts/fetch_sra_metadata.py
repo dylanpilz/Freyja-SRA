@@ -205,16 +205,10 @@ def main():
 
     all_metadata = all_metadata[~all_metadata['site_id'].isna()]
 
-    data = []
-    with open('outputs/aggregate/aggregate_demix.json') as f:
-        for line in f:
-            try:
-                data.append(json.loads(line))
-            except:
-                 continue
-            
-
-    demixed_samples = [d['sra_accession'] for d in data]
+    demixed_samples = []
+    for file in os.listdir('outputs/demix'):
+        if file.endswith('.tsv'):
+            demixed_samples.append(file.split('.')[0])
 
     
     # Failed samples will produce variants output but fail in the demixing step
