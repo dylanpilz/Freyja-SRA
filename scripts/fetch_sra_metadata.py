@@ -205,20 +205,12 @@ def main():
 
     all_metadata = all_metadata[~all_metadata['site_id'].isna()]
 
-    demixed_samples = []
-    for file in os.listdir('outputs/demix'):
-        if file.endswith('.tsv'):
-            demixed_samples.append(file.split('.')[0])
-
-    
-    # Failed samples will produce variants output but fail in the demixing step
-    failed_samples = [file.split('.')[0] for file in os.listdir('outputs/variants') if f'{file.split(".")[0]}.demix.tsv' not in os.listdir('outputs/demix')]
+    finished_samples = [file.split('.')[0] for file in os.listdir('outputs/variants')]
 
     all_metadata = all_metadata[~all_metadata.index.duplicated(keep='first')]
 
     samples_to_run = all_metadata.copy()
-    samples_to_run = samples_to_run[~samples_to_run.index.isin(failed_samples)]
-    samples_to_run = samples_to_run[~samples_to_run.index.isin(demixed_samples)]
+    samples_to_run = samples_to_run[~samples_to_run.index.isin(finished_samples)]
 
     samples_to_run = samples_to_run[~samples_to_run['ww_surv_target_1_conc'].isna()]
     samples_to_run = samples_to_run[samples_to_run['ww_surv_target_1_conc'] != -1.0]
@@ -237,7 +229,7 @@ def main():
 
     print('All samples: ', len(all_metadata))
     print('Newly added samples: ', len(new_metadata))
-    print('Processed samples: ', len(demixed_samples)+len(failed_samples))
+    print('Processed samples: ', len(finished_samples))
     print('Samples to run: ', len(samples_to_run))
 
     # Sort both dataframes by collection date
