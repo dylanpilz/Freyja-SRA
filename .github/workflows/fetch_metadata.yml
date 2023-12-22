@@ -21,11 +21,20 @@ jobs:
         run: |
               pip install pandas biopython shortuuid numpy
 
+      - name: Install Freyja
+        run: |
+              git clone https://github.com/andersen-lab/Freyja.git
+              cd Freyja
+              pip install -e .
+
       - name: Fetch NCBI metadata
         run: python scripts/fetch_sra_metadata.py
 
       - name: Aggregate demix results
         run: python scripts/aggregate_demix.py .
+
+      - name: Aggregate variant results
+        run: python scripts/aggregate_variants.py .
 
       - name: Commit and push changes
         run: |
