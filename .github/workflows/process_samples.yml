@@ -1,8 +1,8 @@
 name: Process samples
 
 on:
-  schedule:
-      - cron:  '0 * * * *'
+  # schedule:
+  #     - cron:  '0 * * * *'
 
 jobs:
   run_samples:
