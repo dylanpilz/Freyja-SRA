@@ -1,0 +1,42 @@
+{
+    "sra_accession": {
+        "type": "keyword",
+        "normalizer": "keyword_lowercase_normalizer"
+    },
+    "mutations": {
+        "type": "nested",
+        "properties": {
+            "mut_name": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "frequency": {
+                "type": "double"
+            },
+            "depth": {
+                "type": "double"
+            }
+        }
+    },
+    "collection_date": {
+        "type": "keyword",
+        "normalizer": "keyword_lowercase_normalizer"
+    },
+    "geo_loc_country": {
+        "type": "keyword",
+        "normalizer": "keyword_lowercase_normalizer"
+    },
+    "geo_loc_region": {
+        "type": "keyword",
+        "normalizer": "keyword_lowercase_normalizer"
+    },
+    "ww_population": {
+        "type": "double"
+    },
+    "viral_load": {
+        "type": "double"
+    },
+    "site_id": {
+        "type": "keyword"
+    }
+}
