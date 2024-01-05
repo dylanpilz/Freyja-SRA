@@ -8,3 +8,4 @@ dependencies:
   - bioconda::nextflow=23.04.3
   - bioconda::minimap2=2.26
   - conda-forge::awscli=2.13.34
+  - conda-forge::google-cloud-sdk=458.0.1
