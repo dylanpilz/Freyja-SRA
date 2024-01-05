@@ -1,3 +1,0 @@
-outputs/aggregate/aggregate_demix.json filter=lfs diff=lfs merge=lfs -text
-outputs/aggregate/aggregate_variants_by_acc.json filter=lfs diff=lfs merge=lfs -text
-outputs/aggregate/aggregate_variants_by_mut.json filter=lfs diff=lfs merge=lfs -text

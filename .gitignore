@@ -4,6 +4,10 @@ work
 log
 null
 
+# Pipeline results
+outputs
+variants_rerun
+
 # vscode
 .vscode
 

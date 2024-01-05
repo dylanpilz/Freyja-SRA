@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
+
 /*
  * Automated pipeline for Freyja analysis of SRA data
  */
@@ -120,11 +121,10 @@ workflow freyja {
 
 workflow rerun_demix {
     Channel
-        .fromFilePairs("${params.output}/variants/SRR*{variants,depths}.tsv")
+        .fromFilePairs("${params.input_dir}/SRR*{variants,depths}.tsv")
         .set { variants_ch }
 
     FREYJA_DEMIX(variants_ch)
         .collect()
         .set { demix_ch }
-
 }
